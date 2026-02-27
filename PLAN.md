@@ -10,12 +10,13 @@
 |-------|-----------|
 | **Monorepo** | pnpm workspaces + Turborepo |
 | **Web** | Next.js 16+ (App Router) + Tailwind CSS 4 + shadcn/ui |
-| **Mobile** | Expo SDK 52+ + NativeWind v4 |
+| **Mobile/Tablet** | Expo SDK 52+ + NativeWind v4 (responsive: phone + tablet) |
 | **Shared** | TypeScript packages for types, validation (Zod), utilities |
 | **Backend** | Supabase (Postgres + Auth + RLS + Realtime + Edge Functions) |
 | **Auth** | Supabase Auth (email/password + magic link) |
 | **Notifications** | Expo Push Notifications + in-app notification center |
 | **Deployment** | Web: Vercel | Mobile: EAS Build/Submit |
+| **Target Devices** | Google Pixel (Android), iPad Pro (iPadOS tablet), Zenbook (web) |
 
 ---
 
@@ -492,22 +493,48 @@ Additional role-based restrictions:
 
 ### 5.2 Navigation (Mobile — Expo Router)
 
-Bottom tab navigation:
+**Phone (Pixel)** — Bottom tab navigation:
 1. **Home** — Dashboard
 2. **Tasks** — Task list with filters
 3. **Shop** — Work orders (Elward workspace) / Shopping lists (Personal)
 4. **Inbox** — Notifications
 5. **More** — Machines, employees, vendors, settings
 
-### 5.3 Key UI Patterns
+**Tablet (iPad Pro)** — Sidebar + content layout:
+- Collapsible sidebar matching the web nav structure (not bottom tabs)
+- Master-detail split views (e.g., task list on left, task detail on right)
+- Multi-column grids for dashboard widgets, project cards, etc.
+- Slide-over panels for quick edits (same as web)
+- Keyboard shortcut support when paired with Magic Keyboard
 
-- **Command palette** (Cmd+K / Ctrl+K on web) — Quick search, navigation, actions
-- **Keyboard shortcuts** throughout web app (Linear-style)
+### 5.3 Responsive Strategy
+
+Three breakpoints handled across the codebase:
+
+| Breakpoint | Device | Layout |
+|------------|--------|--------|
+| **Phone** (`< 768px`) | Pixel, small phones | Bottom tabs, single-column, full-screen views, swipe gestures |
+| **Tablet** (`768px - 1024px`) | iPad Pro | Sidebar nav, split views, 2-column grids, slide-overs |
+| **Desktop** (`> 1024px`) | Zenbook (web) | Full sidebar, multi-column, command palette, keyboard-driven |
+
+- NativeWind breakpoints (`sm`, `md`, `lg`) map to these across Expo
+- Tailwind 4 breakpoints match on the web side
+- Shared design tokens (colors, spacing, typography) in `packages/shared` ensure consistency
+- iPad gets the sidebar navigation pattern (not bottom tabs) to feel closer to the desktop experience
+- `useWindowDimensions()` + NativeWind responsive classes drive layout switching on mobile/tablet
+
+### 5.4 Key UI Patterns
+
+- **Command palette** (Cmd+K / Ctrl+K on web, available on iPad with keyboard) — Quick search, navigation, actions
+- **Keyboard shortcuts** throughout web app and iPad (Linear-style)
 - **Slide-over panels** for task/item detail (no full page navigations for quick edits)
 - **Kanban + List + Table views** for tasks and work orders
 - **Dark mode default**, light mode available
 - **Optimistic updates** for instant feel
 - **Realtime subscriptions** for collaborative data (Supabase Realtime)
+- **Swipe actions** on phone (swipe to complete, archive, delete)
+- **Pull-to-refresh** on all list views (mobile/tablet)
+- **Haptic feedback** on task completion and status changes (mobile)
 
 ---
 
